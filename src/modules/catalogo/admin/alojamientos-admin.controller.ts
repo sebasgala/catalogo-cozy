@@ -49,6 +49,7 @@ export class AlojamientosAdminController {
   }
 
   @Get()
+  @Roles(RolUsuario.RECEPCION, RolUsuario.ADMINISTRADOR, RolUsuario.SUPERADMIN)
   @ApiOperation({
     summary: 'Listar alojamientos (paginado, con filtros opcionales)',
     description: '`habitaciones` cuenta solo las activas; incluirInactivas=true cuenta todas.',
@@ -60,6 +61,7 @@ export class AlojamientosAdminController {
   }
 
   @Get(':id')
+  @Roles(RolUsuario.RECEPCION, RolUsuario.ADMINISTRADOR, RolUsuario.SUPERADMIN)
   @ApiOperation({
     summary: 'Obtener un alojamiento por su id (también si está dado de baja)',
     description: '`habitaciones` cuenta solo las activas; incluirInactivas=true cuenta todas.',

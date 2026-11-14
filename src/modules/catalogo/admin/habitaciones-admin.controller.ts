@@ -34,6 +34,7 @@ export class HabitacionesAdminController {
   constructor(private readonly habitacionesAdminService: HabitacionesAdminService) {}
 
   @Get('alojamientos/:alojamientoId/habitaciones')
+  @Roles(RolUsuario.RECEPCION, RolUsuario.ADMINISTRADOR, RolUsuario.SUPERADMIN)
   @ApiOperation({ summary: 'Listar las habitaciones de un alojamiento', description: 'Por defecto solo las activas; incluirInactivas=true trae todas.' })
   @ApiParam({ name: 'alojamientoId', type: 'integer', example: 1 })
   @ApiResponse({ status: 200, description: 'Habitaciones del alojamiento', type: [HabitacionAdminResponseDto] })
@@ -66,6 +67,7 @@ export class HabitacionesAdminController {
   }
 
   @Get('habitaciones/:id')
+  @Roles(RolUsuario.RECEPCION, RolUsuario.ADMINISTRADOR, RolUsuario.SUPERADMIN)
   @ApiOperation({ summary: 'Ver una habitación (también si está desactivada)' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, description: 'Detalle de la habitación', type: HabitacionAdminResponseDto })

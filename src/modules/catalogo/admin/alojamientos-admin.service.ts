@@ -53,10 +53,14 @@ export class AlojamientosAdminService {
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
-    // El administrador solo lista los suyos; el superadmin, todos.
-    const where: FindOptionsWhere<Alojamiento> = { ...this.acceso.filtroAlojamientos(usuario) };
-    if (query.ciudadId !== undefined) where.ciudadId = query.ciudadId;
-    if (query.activo !== undefined) where.activo = query.activo;
+    // El administrador o recepción solo lista los suyos; el superadmin, todos.
+    const base = this.acceso.filtroAlojamientos(usuario);
+    const extras: FindOptionsWhere<Alojamiento> = {};
+    if (query.ciudadId !== undefined) extras.ciudadId = query.ciudadId;
+    if (query.activo !== undefined) extras.activo = query.activo;
+    const where: FindOptionsWhere<Alojamiento> | FindOptionsWhere<Alojamiento>[] = Array.isArray(base)
+      ? base.map((b) => ({ ...b, ...extras }))
+      : { ...base, ...extras };
 
     const [alojamientos, totalItems] = await this.alojamientosRepository.findAndCount({
       where,

@@ -56,14 +56,20 @@ export class AccesoAdminService {
   }
 
   // Para consultas de TypeORM sobre alojamientos.
-  filtroAlojamientos(usuario: Usuario): FindOptionsWhere<Alojamiento> {
-    const propietario = this.propietarioDelFiltro(usuario);
-    return propietario ? { propietarioId: propietario } : {};
+  filtroAlojamientos(usuario: Usuario): FindOptionsWhere<Alojamiento> | FindOptionsWhere<Alojamiento>[] {
+    if (usuario.rol === RolUsuario.SUPERADMIN) return {};
+    if (usuario.rol === RolUsuario.RECEPCION) return { id: usuario.alojamientoId ?? -1 };
+    if (usuario.alojamientoId != null) return [{ propietarioId: usuario.id }, { id: usuario.alojamientoId }];
+    return { propietarioId: usuario.id };
   }
 
-  private esAdministrable(alojamiento: Pick<Alojamiento, 'propietarioId'>, usuario: Usuario): boolean {
+  private esAdministrable(alojamiento: Pick<Alojamiento, 'id' | 'propietarioId'>, usuario: Usuario): boolean {
     if (usuario.rol === RolUsuario.SUPERADMIN) return true;
-    return usuario.rol === RolUsuario.ADMINISTRADOR && alojamiento.propietarioId === usuario.id;
+    if (usuario.rol === RolUsuario.RECEPCION) return usuario.alojamientoId != null && alojamiento.id === usuario.alojamientoId;
+    return (
+      usuario.rol === RolUsuario.ADMINISTRADOR &&
+      (alojamiento.propietarioId === usuario.id || (usuario.alojamientoId != null && alojamiento.id === usuario.alojamientoId))
+    );
   }
 
   private noEncontrado(detalle: string, parametro: string): RecursoNoEncontradoException {
